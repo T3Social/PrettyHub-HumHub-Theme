@@ -1,7 +1,6 @@
 <?php
 /**
- * Overwrite the original Left Navigation by MenuWidget.
- * - Rename 'Space' to 'Circle'
+ * Left Navigation by MenuWidget.
  *
  * @package humhub.widgets
  * @since 0.5
@@ -10,20 +9,7 @@
 
 <!-- start: list-group navi for large devices -->
 <div class="panel panel-default">
-    <?php foreach ($this->context->getItemGroups() as $group) :
-
-        // Use 'circle' not 'space' in menu
-        switch($group['label']) {
-            case "<strong>Space</strong> menu":
-                $group['label'] = "<strong>Circle</strong> menu";
-            break;
-
-            case "<strong>Space</strong> preferences":
-                $group['label'] = "<strong>Circle</strong> preferences";
-            break;
-        }
-
-        ?>
+    <?php foreach ($this->context->getItemGroups() as $group) : ?>
 
         <?php $items = $this->context->getItems($group['id']); ?>
         <?php if (count($items) == 0) continue; ?>

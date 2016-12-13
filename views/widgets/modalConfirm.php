@@ -1,7 +1,9 @@
 <?php
 
-use humhub\libs\HHtml;
-
+use humhub\compat\CActiveForm;
+use humhub\compat\CHtml;
+use humhub\models\Setting;
+use yii\helpers\Url;
 ?>
 
 <!-- add Tooltip to link -->
@@ -9,12 +11,11 @@ use humhub\libs\HHtml;
 $tooltip = "";
 
 if ($linkTooltipText != "") {
-    $tooltip = 'data-placement="top" data-original-title="' . $linkTooltipText . '"';
+    $tooltip = 'data-placement="top" data-toggle="tooltip" data-original-title="' . $linkTooltipText . '"';
 }
 ?>
 
 <?php
-
 // replace by default the modal content by the new loaded content
 $confirm = 'function(html){ $("#confirmModal_' . $uniqueID . '").html(html);}';
 
@@ -23,24 +24,23 @@ if ($confirmJS != "") {
     // ... or execute own JavaScript code, if exists
     $confirm = $confirmJS;
 }
-
 ?>
 
 <!-- Link to call the confirm modal -->
 <?php if ($linkOutput == 'button') { ?>
 
     <!-- create button element -->
-    <button class="<?php echo $class; ?>" style="<?php echo $style; ?>" data-toggle="modal"
-            data-target="#confirmModal_<?php echo $uniqueID; ?>" <?php echo $tooltip; ?>>
-        <?php echo $linkContent; ?>
+    <button class="<?php echo $class; ?> <?php if ($tooltip != "") : ?>tt<?php endif;?>" style="<?php echo $style; ?>"
+            data-toggle="modal" data-target="#confirmModal_<?php echo $uniqueID; ?>" <?php echo $tooltip; ?>>
+                <?php echo $linkContent; ?>
     </button>
 
 <?php } else if ($linkOutput == 'a') { ?>
 
     <!-- create normal link element -->
-    <a id="deleteLinkPost_<?php echo $uniqueID; ?>" class="<?php echo $class; ?>" style="<?php echo $style; ?>" href="#" data-toggle="modal"
-       data-target="#confirmModal_<?php echo $uniqueID; ?>" <?php echo $tooltip; ?>>
-        <?php echo $linkContent; ?>
+    <a id="deleteLinkPost_<?php echo $uniqueID; ?>" class="<?php echo $class; ?> <?php if ($tooltip != "") : ?>tt<?php endif;?>" style="<?php echo $style; ?>" href="#"
+       data-toggle="modal" data-target="#confirmModal_<?php echo $uniqueID; ?>" <?php echo $tooltip; ?>>
+           <?php echo $linkContent; ?>
     </a>
 
 <?php } ?>
@@ -58,34 +58,28 @@ if ($confirmJS != "") {
                 <?php echo $message; ?>
             </div>
             <div class="modal-footer">
-            	<div class="row">
-                	<div class="col-sm-6">
-						<?php if ($buttonFalse != "") { ?>
-                            <button type="button" class="btn btn-default"
-                                    data-dismiss="modal"><?php echo $buttonFalse; ?></button>
+                <?php if ($buttonTrue != "") { ?>
+
+                    <?php
+                    echo \humhub\widgets\AjaxButton::widget([
+                        'label' => $buttonTrue,
+                        'ajaxOptions' => [
+                            'type' => 'POST',
+                            'success' => $confirm,
+                            'url' => $linkHref,
+                        ],
+                        'htmlOptions' => [
+                            'return' => 'true',
+                            'class' => 'btn btn-primary',
+                            'data-dismiss' => 'modal'
+                        ]
+                    ]);
+                    ?>
+                <?php } ?>
+                <?php if ($buttonFalse != "") { ?>
+                    <button type="button" class="btn btn-primary"
+                            data-dismiss="modal"><?php echo $buttonFalse; ?></button>
                         <?php } ?>
-                  	</div>
-                    
-                	<div class="col-sm-6">
-						<?php if ($buttonTrue != "") { ?>
-                            <?php
-                            echo \humhub\widgets\AjaxButton::widget([
-                                'label' => $buttonTrue,
-                                'ajaxOptions' => [
-                                    'type' => 'POST',
-                                    'success' => $confirm,
-                                    'url' => $linkHref,
-                                ],
-                                'htmlOptions' => [
-                                    'return' => 'true',
-                                    'class' => 'btn btn-primary',
-                                    'data-dismiss' => 'modal'
-                                ]
-                            ]);
-                            ?>
-                        <?php } ?>
-                  	</div>
-                </div>    
             </div>
         </div>
     </div>
@@ -105,9 +99,11 @@ if ($confirmJS != "") {
     $('#confirmModal_<?php echo $uniqueID; ?>').on('shown.bs.modal', function (e) {
 
         // execute optional JavaScript code, when modal is showing
-        <?php if ($modalShownJS != "") {
-            echo $modalShownJS;
-        } ?>
+<?php
+if ($modalShownJS != "") {
+    echo $modalShownJS;
+}
+?>
 
         // remove standard modal with
         $('#confirmModal_<?php echo $uniqueID; ?> .modal-dialog').attr('style', '');
