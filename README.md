@@ -18,5 +18,5 @@ Theme is not 100% working and styled so far. It needs further development and up
 
 
 ## Author
-- Andreas Holzer - [todgmbh.de](http://todgmbh.de)
+- Andreas Holzer - [https://crazymates.de](https://crazymates.de)
 - WebCrew - [web-crew.org](http://web-crew.org)
